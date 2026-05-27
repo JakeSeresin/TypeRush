@@ -1,0 +1,17 @@
+{
+  "name": "TypeRush",
+  "short_name": "TypeRush",
+  "description": "Cinematic typing speed trainer with adaptive calibration",
+  "start_url": "index.html",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#080810",
+  "theme_color": "#080810",
+  "id": "typerush-app-v3",
+  "lang": "en-US",
+  "scope": "/",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}
