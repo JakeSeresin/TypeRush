@@ -14,7 +14,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <link rel="stylesheet" href="style.css">
-  <title>TypeRush — Calibrated Speed</title>
+  <title>TypeRush</title>
 </head>
 <body>
 
@@ -43,13 +43,13 @@
     <i class="fa-solid fa-lock-keyhole"></i> Caps Lock is ON
   </div>
 
-  <!-- Pause Overlay -->
-  <div class="pause-overlay" id="pauseOverlay">
-    <div class="pause-content">
-      <div class="pause-icon"><i class="fa-solid fa-pause"></i></div>
-      <div class="pause-label">PAUSED</div>
-      <div class="pause-hint">Press <kbd>P</kbd> or click to resume</div>
-    </div>
+  <!-- Pause Banner (non-blocking — lets user interact with rest of app) -->
+  <div class="pause-banner" id="pauseBanner">
+    <i class="fa-solid fa-pause"></i>
+    <span>Paused — timer &amp; progress frozen</span>
+    <button class="pause-resume-btn" id="pauseResumeBtn">
+      Resume <kbd>P</kbd>
+    </button>
   </div>
 
   <!-- Results Modal -->
@@ -323,6 +323,9 @@
         <span class="sc"><kbd>Ctrl</kbd>+<kbd>R</kbd> restart</span>
       </div>
       <div class="credits">
+        <button class="btn-features" id="featuresBtn" title="What does TypeRush do?">
+          <i class="fa-solid fa-circle-info"></i> Features
+        </button>
         <span>Made by <strong>WHYZEE</strong></span>
         <a href="https://www.instagram.com/yaszaher_" target="_blank" rel="noopener" aria-label="Instagram" class="cred-link">
           <i class="fa-brands fa-instagram"></i>
@@ -334,6 +337,34 @@
     </footer>
 
   </div><!-- /app -->
+
+  <!-- Features Modal -->
+  <div class="modal-overlay" id="featuresOverlay" role="dialog" aria-modal="true" aria-label="Features">
+    <div class="features-modal">
+      <div class="features-modal-header">
+        <h2 class="features-modal-title"><i class="fa-solid fa-bolt"></i> TypeRush Features</h2>
+        <button class="panel-close" id="featuresClose" aria-label="Close features"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="features-list">
+        <div class="feat-row"><span class="feat-ico">⏱️</span><div><strong>30s / 1m / 5m modes</strong> — Pick a time limit. Your WPM and accuracy are measured when the timer runs out.</div></div>
+        <div class="feat-row"><span class="feat-ico">🔢</span><div><strong>Word Count mode</strong> — Choose 10, 25, 50 or 100 words. The test ends once you type them all.</div></div>
+        <div class="feat-row"><span class="feat-ico">✏️</span><div><strong>Custom Text</strong> — Paste anything — notes, code, quotes — and type that instead of the built-in word pool.</div></div>
+        <div class="feat-row"><span class="feat-ico">🗄️</span><div><strong>Text Bank</strong> — Save multiple custom texts with labels so you can switch between them any time.</div></div>
+        <div class="feat-row"><span class="feat-ico">🧠</span><div><strong>Calibration Engine</strong> — After each test the app learns which words slow you down. Those words appear more often in your next test automatically.</div></div>
+        <div class="feat-row"><span class="feat-ico">🔥</span><div><strong>Daily Streak</strong> — A calendar grid tracks how many tests you do each day. Click the fire icon to see it.</div></div>
+        <div class="feat-row"><span class="feat-ico">📈</span><div><strong>Live WPM Chart</strong> — A small sparkline graph shows your speed changing in real time while you type.</div></div>
+        <div class="feat-row"><span class="feat-ico">🏆</span><div><strong>Results Screen</strong> — After every test you see Net WPM, Raw WPM, Accuracy, Errors, Time, and your all-time best.</div></div>
+        <div class="feat-row"><span class="feat-ico">🕐</span><div><strong>History</strong> — Click the clock icon to see your last 50 results with date, mode, WPM, and accuracy.</div></div>
+        <div class="feat-row"><span class="feat-ico">🔤</span><div><strong>Categories</strong> — Switch the word pool between All, General, Quotes, Tech, or your saved Bank texts.</div></div>
+        <div class="feat-row"><span class="feat-ico">🔡</span><div><strong>Font Size</strong> — Three size options (A / A / A) for the typing text — pick what suits your screen.</div></div>
+        <div class="feat-row"><span class="feat-ico">🔊</span><div><strong>Sound Effects</strong> — Optional click on correct keys, buzz on errors, chime on finish. Toggle the speaker icon.</div></div>
+        <div class="feat-row"><span class="feat-ico">⏸️</span><div><strong>Pause</strong> — Press P or the Pause button. The timer freezes but the rest of the app stays interactive.</div></div>
+        <div class="feat-row"><span class="feat-ico">🌙</span><div><strong>Dark / Light Theme</strong> — Toggle with the half-circle icon. Your choice is saved automatically.</div></div>
+        <div class="feat-row"><span class="feat-ico">🔒</span><div><strong>Caps Lock Warning</strong> — A yellow bar appears if Caps Lock is on so you never type in uppercase by mistake.</div></div>
+        <div class="feat-row"><span class="feat-ico">📴</span><div><strong>Offline / PWA</strong> — Works with no internet. Install from your browser for a native app feel on desktop or mobile.</div></div>
+      </div>
+    </div>
+  </div>
 
   <!-- Confetti -->
   <canvas id="confettiCanvas" aria-hidden="true"></canvas>

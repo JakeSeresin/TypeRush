@@ -131,7 +131,9 @@ const D = {
   restartBtn: document.getElementById('restartBtn'),
   // Overlays
   capslockBar: document.getElementById('capslockBar'),
-  pauseOverlay: document.getElementById('pauseOverlay'),
+  pauseOverlay: document.getElementById('pauseBanner'),   // now a banner, not overlay
+  pauseBanner: document.getElementById('pauseBanner'),
+  pauseResumeBtn: document.getElementById('pauseResumeBtn'),
   resultsOverlay: document.getElementById('resultsOverlay'),
   resultWPM: document.getElementById('resultWPM'),
   resultRawWPM: document.getElementById('resultRawWPM'),
@@ -191,6 +193,9 @@ const D = {
   soundIcon: document.getElementById('soundIcon'),
   themeToggle: document.getElementById('themeToggle'),
   confettiCanvas: document.getElementById('confettiCanvas'),
+  featuresBtn: document.getElementById('featuresBtn'),
+  featuresOverlay: document.getElementById('featuresOverlay'),
+  featuresClose: document.getElementById('featuresClose'),
 };
 
 // ─────────────────────────────────────────────
@@ -1002,14 +1007,14 @@ function pauseTest() {
   if (STATE.status === 'running') {
     STATE.status = 'paused';
     STATE.elapsedPaused += Date.now() - STATE.startTime;
-    D.pauseOverlay.classList.add('visible');
+    D.pauseBanner.classList.add('visible');
     D.stage.classList.remove('running');
     D.pauseBtn.innerHTML = '<i class="fa-solid fa-play"></i> Resume';
     clearInterval(STATE.timerInterval);
   } else if (STATE.status === 'paused') {
     STATE.status = 'running';
     STATE.startTime = Date.now();
-    D.pauseOverlay.classList.remove('visible');
+    D.pauseBanner.classList.remove('visible');
     D.stage.classList.add('running');
     D.pauseBtn.innerHTML = '<i class="fa-solid fa-pause"></i> Pause';
     D.ghostInput.focus();
@@ -1036,7 +1041,7 @@ function resetState() {
   STATE.sparklineData = [];
 
   D.stage.classList.remove('running');
-  D.pauseOverlay.classList.remove('visible');
+  D.pauseBanner.classList.remove('visible');
   D.sparklineBar.style.display = 'none';
   D.ghostInput.value = '';
 
@@ -1059,7 +1064,7 @@ function finishTest() {
   STATE.status = 'finished';
   clearInterval(STATE.timerInterval);
   D.stage.classList.remove('running');
-  D.pauseOverlay.classList.remove('visible');
+  D.pauseBanner.classList.remove('visible');
   D.startBtn.disabled = false;
   D.pauseBtn.disabled = true;
 
@@ -1325,7 +1330,19 @@ function attach() {
   // Backdrop
   D.panelBackdrop.addEventListener('click', closeAllPanels);
 
-  // Pause overlay click
+  // Pause resume button (banner)
+  D.pauseResumeBtn.addEventListener('click', () => {
+    if (STATE.status === 'paused') pauseTest();
+  });
+
+  // Features modal
+  D.featuresBtn.addEventListener('click', () => D.featuresOverlay.classList.add('visible'));
+  D.featuresClose.addEventListener('click', () => D.featuresOverlay.classList.remove('visible'));
+  D.featuresOverlay.addEventListener('click', e => {
+    if (e.target === D.featuresOverlay) D.featuresOverlay.classList.remove('visible');
+  });
+
+  // Pause overlay click (legacy alias — now targets banner, kept for safety)
   D.pauseOverlay.addEventListener('click', () => STATE.status === 'paused' && pauseTest());
 
   // Results modal
@@ -1343,24 +1360,30 @@ function attach() {
   // Keyboard shortcuts
   document.addEventListener('keydown', e => {
     const active = document.activeElement;
-    const isInput = active === D.ghostInput || active === D.customTextarea ||
-                    active === D.bankTextarea || active === D.bankTitleInput;
 
+    // Never intercept keys while the user is actively typing in the test
+    const isTypingNow = (active === D.ghostInput) && STATE.status === 'running';
+    // Never intercept keys while user is filling in a text field
+    const isTextarea = active === D.customTextarea || active === D.bankTextarea || active === D.bankTitleInput;
+
+    // Ctrl/Cmd+R always restarts regardless of focus
     if ((e.ctrlKey || e.metaKey) && e.key === 'r') { e.preventDefault(); restartTest(); return; }
 
-    if (!isInput || active === D.ghostInput) {
-      if (e.key === 'p' || e.key === 'P') {
-        if (STATE.status === 'running' || STATE.status === 'paused') { e.preventDefault(); pauseTest(); }
-      }
-      if (e.key === 'Enter' && (STATE.status === 'idle' || STATE.status === 'finished')) {
-        e.preventDefault(); startTest();
-      }
-      if (e.key === 'Escape') {
-        if (D.resultsOverlay.classList.contains('visible')) { hideResults(); return; }
-        if (D.historyPanel.classList.contains('open') || D.bankPanel.classList.contains('open')) { closeAllPanels(); return; }
-        if (D.streakSection.style.display !== 'none') { D.streakSection.style.display = 'none'; return; }
-        if (STATE.status !== 'idle') { e.preventDefault(); resetState(); }
-      }
+    // All other shortcuts are skipped while typing or inside a textarea
+    if (isTypingNow || isTextarea) return;
+
+    if (e.key === 'p' || e.key === 'P') {
+      if (STATE.status === 'running' || STATE.status === 'paused') { e.preventDefault(); pauseTest(); }
+    }
+    if (e.key === 'Enter' && (STATE.status === 'idle' || STATE.status === 'finished')) {
+      e.preventDefault(); startTest();
+    }
+    if (e.key === 'Escape') {
+      if (D.featuresOverlay.classList.contains('visible')) { D.featuresOverlay.classList.remove('visible'); return; }
+      if (D.resultsOverlay.classList.contains('visible')) { hideResults(); return; }
+      if (D.historyPanel.classList.contains('open') || D.bankPanel.classList.contains('open')) { closeAllPanels(); return; }
+      if (D.streakSection.style.display !== 'none') { D.streakSection.style.display = 'none'; return; }
+      if (STATE.status !== 'idle') { e.preventDefault(); resetState(); }
     }
   });
 }

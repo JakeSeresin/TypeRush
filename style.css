@@ -1242,6 +1242,139 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   .topbar-btn { width: 32px; height: 32px; font-size: 0.78rem; }
 }
 
+/* ===== Pause Banner (non-blocking) ===== */
+.pause-banner {
+  position: fixed;
+  top: -80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-3);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-pill);
+  padding: 0.55rem 0.75rem 0.55rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  z-index: 900;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5), 0 0 16px var(--accent-glow);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--accent-2);
+  white-space: nowrap;
+  transition: top 0.38s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+.pause-banner.visible {
+  top: 1rem;
+  pointer-events: auto;
+}
+.pause-resume-btn {
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius-pill);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 0.35rem 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: background var(--transition), transform var(--transition);
+  flex-shrink: 0;
+}
+.pause-resume-btn:hover { background: var(--accent-2); transform: translateY(-1px); }
+.pause-resume-btn kbd {
+  background: rgba(255,255,255,0.18);
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+  font-size: 0.62rem;
+}
+
+/* ===== Features Button (footer) ===== */
+.btn-features {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  color: var(--text-2);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  transition: all var(--transition);
+}
+.btn-features:hover {
+  background: var(--accent-subtle);
+  border-color: var(--accent);
+  color: var(--accent-2);
+}
+
+/* ===== Features Modal ===== */
+.features-modal {
+  background: var(--bg-3);
+  border: 1px solid var(--border-2);
+  border-radius: 20px;
+  padding: 1.75rem;
+  width: 100%;
+  max-width: 540px;
+  max-height: 88dvh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  animation: modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modal-pop {
+  from { opacity: 0; transform: scale(0.93) translateY(16px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+
+.features-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+}
+
+.features-modal-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent-2), var(--success));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.features-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.feat-row {
+  display: flex;
+  gap: 0.85rem;
+  align-items: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 0.9rem;
+  font-size: 0.82rem;
+  color: var(--text-2);
+  line-height: 1.55;
+}
+.feat-row strong { color: var(--text); font-weight: 700; }
+.feat-ico { font-size: 1.05rem; flex-shrink: 0; margin-top: 0.05rem; }
+
 /* ===== Adsterra 160x600 Left Sidebar Ad ===== */
 .ad-sidebar-left {
   position: fixed;
@@ -1255,10 +1388,9 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  /* Sits in the left gutter — invisible on narrow viewports */
 }
 
-/* On very wide screens, nudge the app right so ad never overlaps content */
+/* Shift app right on wide screens so ad sits in the gutter without overlapping */
 @media (min-width: 1220px) {
   .app {
     margin-left: 180px;
@@ -1266,7 +1398,7 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   }
 }
 
-/* Hide ad on tablets and mobile — anything under 768px */
+/* Hide on tablets and mobile */
 @media (max-width: 768px) {
   .ad-sidebar-left {
     display: none;
