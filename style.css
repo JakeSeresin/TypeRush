@@ -1241,3 +1241,34 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   .font-group { margin-left: 0; }
   .topbar-btn { width: 32px; height: 32px; font-size: 0.78rem; }
 }
+
+/* ===== Adsterra 160x600 Left Sidebar Ad ===== */
+.ad-sidebar-left {
+  position: fixed;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 160px;
+  height: 600px;
+  z-index: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  /* Sits in the left gutter — invisible on narrow viewports */
+}
+
+/* On very wide screens, nudge the app right so ad never overlaps content */
+@media (min-width: 1220px) {
+  .app {
+    margin-left: 180px;
+    margin-right: auto;
+  }
+}
+
+/* Hide ad on tablets and mobile — anything under 768px */
+@media (max-width: 768px) {
+  .ad-sidebar-left {
+    display: none;
+  }
+}
