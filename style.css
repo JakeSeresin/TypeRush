@@ -1186,10 +1186,13 @@ kbd {
 
 /* ===== Confetti canvas ===== */
 #confettiCanvas {
-  position: fixed; inset: 0;
-  width: 100%; height: 100%;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 9998;
+  display: block;
 }
 
 /* ===== Animations ===== */
@@ -1390,11 +1393,10 @@ button:focus-visible, input:focus-visible, textarea:focus-visible {
   overflow: hidden;
 }
 
-/* Shift app right on wide screens so ad sits in the gutter without overlapping */
+/* Keep app centered on wide screens — ad stays fixed in left gutter */
 @media (min-width: 1220px) {
   .app {
-    margin-left: 180px;
-    margin-right: auto;
+    margin: 0 auto;
   }
 }
 

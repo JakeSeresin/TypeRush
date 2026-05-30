@@ -131,7 +131,6 @@ const D = {
   restartBtn: document.getElementById('restartBtn'),
   // Overlays
   capslockBar: document.getElementById('capslockBar'),
-  pauseOverlay: document.getElementById('pauseBanner'),   // now a banner, not overlay
   pauseBanner: document.getElementById('pauseBanner'),
   pauseResumeBtn: document.getElementById('pauseResumeBtn'),
   resultsOverlay: document.getElementById('resultsOverlay'),
@@ -675,7 +674,12 @@ function markWordDone(idx, correct) {
 // ─────────────────────────────────────────────
 function handleInput(e) {
   if (STATE.status !== 'running') {
-    if (STATE.status === 'idle') startTest();
+    // Only auto-start on real character input, not backspace/modifier/etc.
+    if (STATE.status === 'idle' && e.target.value.trim().length > 0) {
+      startTest();
+    } else {
+      e.target.value = ''; // clear any non-character input
+    }
     return;
   }
 
@@ -719,7 +723,6 @@ function handleInput(e) {
     highlightCurrentWord();
     updateStats();
   } else {
-    const prevLen = STATE.currentInput.length;
     STATE.currentInput = val;
     STATE.totalKeystrokes++;
 
@@ -779,7 +782,7 @@ function updateStats() {
   D.errorsValue.textContent = STATE.errors;
 
   if (['30s','1m','5m'].includes(STATE.mode)) {
-    const elapsed = Math.floor((now - STATE.startTime) / 1000);
+    const elapsed = Math.floor((now - STATE.startTime + STATE.elapsedPaused) / 1000);
     const remaining = Math.max(0, STATE.totalTime - elapsed);
     D.timerValue.textContent = `${remaining}s`;
     if (remaining <= 0 && STATE.status === 'running') { finishTest(); return; }
@@ -1269,7 +1272,10 @@ function attach() {
   // Custom text
   D.customConfirm.addEventListener('click', () => {
     const txt = D.customTextarea.value.trim();
-    if (txt) { STATE.customText = txt; STATE.category = 'custom'; }
+    if (txt) {
+      STATE.customText = txt;
+      setCategory('custom');
+    }
   });
 
   // Theme & sound
@@ -1330,7 +1336,7 @@ function attach() {
   // Backdrop
   D.panelBackdrop.addEventListener('click', closeAllPanels);
 
-  // Pause resume button (banner)
+  // Pause banner resume button
   D.pauseResumeBtn.addEventListener('click', () => {
     if (STATE.status === 'paused') pauseTest();
   });
@@ -1341,9 +1347,6 @@ function attach() {
   D.featuresOverlay.addEventListener('click', e => {
     if (e.target === D.featuresOverlay) D.featuresOverlay.classList.remove('visible');
   });
-
-  // Pause overlay click (legacy alias — now targets banner, kept for safety)
-  D.pauseOverlay.addEventListener('click', () => STATE.status === 'paused' && pauseTest());
 
   // Results modal
   D.resultsTryAgain.addEventListener('click', () => { hideResults(); startTest(); });
