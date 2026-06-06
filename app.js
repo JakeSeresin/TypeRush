@@ -195,6 +195,13 @@ const D = {
   featuresBtn: document.getElementById('featuresBtn'),
   featuresOverlay: document.getElementById('featuresOverlay'),
   featuresClose: document.getElementById('featuresClose'),
+  // Mobile Beta
+  mobileBetaBtn: document.getElementById('mobileBetaBtn'),
+  mobileBetaOverlay: document.getElementById('mobileBetaOverlay'),
+  mobileBetaClose: document.getElementById('mobileBetaClose'),
+  mobileBetaEmail: document.getElementById('mobileBetaEmail'),
+  mobileBetaSubmit: document.getElementById('mobileBetaSubmit'),
+  mobileBetaMsg: document.getElementById('mobileBetaMsg'),
 };
 
 // ─────────────────────────────────────────────
@@ -1244,6 +1251,53 @@ function handleCapsLock(e) {
 }
 
 // ─────────────────────────────────────────────
+// MOBILE BETA (EmailJS)
+// ─────────────────────────────────────────────
+(function() {
+  if (typeof emailjs !== 'undefined') emailjs.init('5wovTyHZRI9p6NsEz');
+})();
+
+function openMobileBeta() {
+  D.mobileBetaOverlay.classList.add('visible');
+  D.mobileBetaEmail.value = '';
+  D.mobileBetaMsg.textContent = '';
+  D.mobileBetaMsg.className = 'beta-msg';
+  D.mobileBetaSubmit.disabled = false;
+  D.mobileBetaSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Join Beta';
+  setTimeout(() => D.mobileBetaEmail.focus(), 80);
+}
+
+function closeMobileBeta() {
+  D.mobileBetaOverlay.classList.remove('visible');
+}
+
+function submitMobileBeta() {
+  const email = D.mobileBetaEmail.value.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    D.mobileBetaMsg.textContent = 'Please enter a valid email address.';
+    D.mobileBetaMsg.className = 'beta-msg beta-msg-error';
+    return;
+  }
+  D.mobileBetaSubmit.disabled = true;
+  D.mobileBetaSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sending…';
+  emailjs.send('service_q4nkvor', 'template_9zlz2h1', {
+    user_email: email,
+    reply_to: email
+  }).then(() => {
+    D.mobileBetaMsg.textContent = '✓ You\'re on the list! We\'ll be in touch soon.';
+    D.mobileBetaMsg.className = 'beta-msg beta-msg-success';
+    D.mobileBetaEmail.value = '';
+    D.mobileBetaSubmit.innerHTML = '<i class="fa-solid fa-check"></i> Done!';
+    setTimeout(closeMobileBeta, 2400);
+  }).catch(() => {
+    D.mobileBetaMsg.textContent = 'Something went wrong — please try again.';
+    D.mobileBetaMsg.className = 'beta-msg beta-msg-error';
+    D.mobileBetaSubmit.disabled = false;
+    D.mobileBetaSubmit.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Join Beta';
+  });
+}
+
+// ─────────────────────────────────────────────
 // 22. EVENT LISTENERS
 // ─────────────────────────────────────────────
 function attach() {
@@ -1354,6 +1408,13 @@ function attach() {
     if (e.target === D.featuresOverlay) D.featuresOverlay.classList.remove('visible');
   });
 
+  // Mobile Beta modal
+  D.mobileBetaBtn.addEventListener('click', openMobileBeta);
+  D.mobileBetaClose.addEventListener('click', closeMobileBeta);
+  D.mobileBetaOverlay.addEventListener('click', e => { if (e.target === D.mobileBetaOverlay) closeMobileBeta(); });
+  D.mobileBetaEmail.addEventListener('keydown', e => { if (e.key === 'Enter') submitMobileBeta(); });
+  D.mobileBetaSubmit.addEventListener('click', submitMobileBeta);
+
   // Results modal
   D.resultsTryAgain.addEventListener('click', () => { hideResults(); startTest(); });
   D.resultsClose.addEventListener('click', hideResults);
@@ -1388,6 +1449,7 @@ function attach() {
       e.preventDefault(); startTest();
     }
     if (e.key === 'Escape') {
+      if (D.mobileBetaOverlay.classList.contains('visible')) { closeMobileBeta(); return; }
       if (D.featuresOverlay.classList.contains('visible')) { D.featuresOverlay.classList.remove('visible'); return; }
       if (D.resultsOverlay.classList.contains('visible')) { hideResults(); return; }
       if (D.historyPanel.classList.contains('open') || D.bankPanel.classList.contains('open')) { closeAllPanels(); return; }
