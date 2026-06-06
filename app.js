@@ -676,9 +676,17 @@ function handleInput(e) {
   if (STATE.status !== 'running') {
     // Only auto-start on real character input, not backspace/modifier/etc.
     if (STATE.status === 'idle' && e.target.value.trim().length > 0) {
+      const firstChar = e.target.value; // preserve what was typed
       startTest();
+      // Re-inject the character so it isn't lost
+      if (STATE.status === 'running') {
+        D.ghostInput.value = firstChar;
+        STATE.currentInput = firstChar;
+        updateCharHighlight();
+        updateStats();
+      }
     } else {
-      e.target.value = ''; // clear any non-character input
+      e.target.value = '';
     }
     return;
   }
@@ -710,13 +718,11 @@ function handleInput(e) {
     STATE.wordStartTime = Date.now();
     D.ghostInput.value = '';
 
-    if (STATE.mode === 'wordCount' && STATE.currentWordIndex >= STATE.targetWords.length) {
-      finishTest(); return;
-    }
-    if (STATE.mode === 'custom' && STATE.currentWordIndex >= STATE.targetWords.length) {
-      finishTest(); return;
-    }
-    if (STATE.mode === 'bank' && STATE.currentWordIndex >= STATE.targetWords.length) {
+    // End test when all words typed (word count mode, or custom/bank category in any mode)
+    const isWordLimitMode = STATE.mode === 'wordCount' ||
+                            STATE.category === 'bank' ||
+                            STATE.category === 'custom';
+    if (isWordLimitMode && STATE.currentWordIndex >= STATE.targetWords.length) {
       finishTest(); return;
     }
 
@@ -726,14 +732,14 @@ function handleInput(e) {
     STATE.currentInput = val;
     STATE.totalKeystrokes++;
 
-    // Per-keystroke accuracy
+    // Per-keystroke accuracy tracking (correctKeystrokes only — errors tracked at word level)
     if (val.length > 0) {
       const i = val.length - 1;
-      if (i < target.length) {
-        if (val[i] === target[i]) { STATE.correctKeystrokes++; Sound.play('key'); }
-        else { STATE.errors++; Sound.play('error'); }
+      if (i < target.length && val[i] === target[i]) {
+        STATE.correctKeystrokes++;
+        Sound.play('key');
       } else {
-        STATE.errors++; Sound.play('error');
+        Sound.play('error');
       }
     }
     updateCharHighlight();
@@ -1148,7 +1154,7 @@ function hideResults() {
 // 18. MODE / CATEGORY / FONT SIZE
 // ─────────────────────────────────────────────
 function setMode(mode) {
-  if (STATE.status === 'running') return;
+  if (STATE.status === 'running' || STATE.status === 'paused') return;
   STATE.mode = mode;
   D.modePills.forEach(p => p.classList.toggle('active', p.dataset.mode === mode));
 
